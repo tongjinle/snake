@@ -1,11 +1,28 @@
 var server = require('http').createServer();
 var io = require('socket.io')(server);
+
+
+var chatList = [];
+
 io.on('connection', function(client) {
 	console.log('a user connect...');
+
+	client.emit("enterroom",chatList);
+
 	client.on('event', function(data) {
 		console.log(data);
 	});
 	client.on('disconnect', function() {});
+
+
+
+	client.on("chat",function(data){
+		var content=[data.username,data.text].join(':');
+		console.log(content);
+		chatList.push(content);
+
+		client.emit("chatmsg",content);
+	});
 });
 server.listen(3000, () => console.log('server start'));
 
