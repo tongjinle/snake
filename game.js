@@ -7,6 +7,8 @@ var lastTs = null;
 var tick = 0;
 
 var sn;
+var map;
+var render;
 
 var game = {
 	start: function() {
@@ -22,9 +24,12 @@ var game = {
 	},
 	init: function() {
 		map = new Map(10, 10);
-		renderMap(map);
+
 		sn = new Snake(0, 0);
 		sn.setMap(map);
+		
+		this.setRender();
+
 		console.log('game init');
 	},
 	// dt表示过去了多少时间
@@ -62,6 +67,18 @@ var game = {
 			}
 		});
 	},
+	setRender:function(){
+		var myCanvas = $("#myCanvas");
+		var width = map.width * conf.map.size;
+		var height = map.height * conf.map.size;
+		myCanvas.attr({
+			width:width,
+			height:height
+		});
+		var ctx=myCanvas[0].getContext("2d");
+		this.render = new Render(ctx,width,height);
+
+	},
 	unbind: function() {
 		this._list.length = 0;
 		console.log('game is over');
@@ -71,11 +88,11 @@ var game = {
 
 $(function() {
 
-	game.init();
 
+	game.init();
 	game.schedule(function() {
 		sn.move();
-		renderSnake(sn);
+		// renderSnake(sn);
 	}, 100 / sn.speed * 1000);
 
 	game.schedule(function() {
@@ -88,10 +105,10 @@ $(function() {
 		}
 	}, map.createInterval);
 
-	game.schedule(function(){
-		renderFruit(map.fruit);
+	// game.schedule(function(){
+	// 	// renderFruit(map.fruit);
 
-	},20);
+	// },20);
 
 	game.schedule(function() {
 		if (!sn.isAlive) {
@@ -99,7 +116,37 @@ $(function() {
 		}
 	}, 50);
 
+	game.schedule(function(){
+		var render = this.render;
+		// clear
+		render.clear();
+		// map
+		var mapSize = conf.map.size;
+		for (var i = 0; i < map.width; i++) {
+			for (var j = 0; j < map.height; j++) {
+				render.rect(i*mapSize,j*mapSize,mapSize,mapSize,(i+j)%2?'black':'white');
+			}
+		}
+
+		// snake
+		var snakeSize = conf.snake.size;
+		render.rect(sn.head.x*snakeSize,sn.head.y*snakeSize,snakeSize,snakeSize,'red');
+		sn.tails.forEach(function(tail){
+			render.rect(tail.x*snakeSize,tail.y*snakeSize,snakeSize,snakeSize,'pink');
+		});
+
+		// fruit
+		var fruitSize = conf.fruit.size;
+		if(map.fruit){
+			var fruit = map.fruit;
+			render.rect(fruit.x*fruitSize,fruit.y*fruitSize,fruitSize,fruitSize,'green');
+		}
+
+	}.bind(game),17);
+
 	game.start();
+
+
 
 
 });
