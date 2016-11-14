@@ -21,7 +21,7 @@ io.on('connection', function(client) {
 		console.log(content);
 		chatList.push(content);
 
-		client.emit("chatmsg",content);
+		io.emit("chatmsg",content);
 	});
 });
 server.listen(3000, () => console.log('server start'));
