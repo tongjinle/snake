@@ -8,7 +8,7 @@
 	};
 
 	conf.snake = {
-		speed: 400,
+		speed: 800,
 		directions: {
 			up: 0,
 			right: 1,
