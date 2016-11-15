@@ -7,9 +7,9 @@
 // eat
 // turn
 
+var conf = require('./config');
 
 (function() {
-	var conf = this.conf;
 	var directions = conf.snake.directions;
 
 	function Snake(x, y) {
@@ -137,4 +137,7 @@
 
 
 	this.Snake = Snake;
+
+
+	module.exports = Snake;
 }).call(this);

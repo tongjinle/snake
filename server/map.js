@@ -1,3 +1,5 @@
+var conf = require('./config');
+
 (function() {
 	function Map(width, height) {
 		this.width = width;
@@ -19,8 +21,8 @@
 		console.log('map createFruit');
 	};
 
-	handle.createInterval = this.conf.map.createInterval * 1000;
+	handle.createInterval = conf.map.createInterval * 1000;
 
 	this.Map = Map;
-
+	module.exports = Map;
 }).call(this);

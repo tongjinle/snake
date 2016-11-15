@@ -18,33 +18,59 @@ var render;
 
 
 
-
 var game = {
-	canJoin:function(){
-		return true;
+	canJoin: function() {
+		var userList = this.userList;
+		return userList.length < conf.user.maxCount && !this.isRunning;
 	},
 
-	joinUser:function(username){
-		var userList = this.userList = this.userList ||[];
+	joinUser: function(username) {
+		var userList = this.userList;
 
 		var sn = this._createSnake();
 		userList.push({
-			name:username,
-			sn:sn,
-			ready
-		})
+			name: username,
+			sn: sn,
+			ready: false
+		});
 	},
-	quitUser:function(username){
-		
+	quitUser: function(username) {
+
 	},
-	readyUser:function(username,ready){
-		var user = this.userList.find(function(user){return user.name == username;});
+	readyUser: function(username, ready) {
+		var user = this.userList.find(function(user) {
+			return user.name == username;
+		});
 		user.ready = ready;
 
 		// 是否开始游戏
+		this._tryStart();
+
+
 	},
-	_createSnake:function(){
-		
+	_tryStart: function() {
+		// 用户人数满足 && 用户都已经准备完毕
+		if (this.userList.length >= conf.user.maxCount && !this.userList.filter(function(user) {
+				return !user.ready;
+			}).length) {
+			this.start();
+		}
+	},
+	_createSnake: function() {
+		var sn ;
+		while (1) {
+			var x = Math.floor(Math.random() * this.map.width);
+			var y = Math.floor(Math.random() * this.map.height);
+			isExist = this.userList.find(function(user) {
+				return user.sn.head.x == x && user.sn.head.y == y;
+			});
+			if (!isExist) {
+				sn = new Snake(x, y);
+				sn.setMap(map);
+				break;
+			}
+		}
+		return sn;
 	},
 
 	start: function() {
@@ -59,13 +85,11 @@ var game = {
 		}.bind(this), interval);
 	},
 	init: function() {
-		map = new GameMap(conf.map.size,conf.map.size);;
+		this.userList = [];
+		this.isRunning = false;
 
-		sn = new Snake(0, 0);
-		sn.setMap(map);
-		
-		this.setRender();
-
+		this._list = [];
+		this.map = new GameMap(conf.map.size, conf.map.size);
 		console.log('game init');
 	},
 	// dt表示过去了多少时间
@@ -87,33 +111,38 @@ var game = {
 		});
 	},
 	listen: function() {
-		$(window).bind('keypress', function(e) {
-			var keyCode = e.keyCode;
-			var keys = conf.keys;
-			if (keyCode == keys.up) {
-				sn.turn(conf.snake.directions.up);
-			} else if (keyCode == keys.right) {
-				sn.turn(conf.snake.directions.right);
+		// $(window).bind('keypress', function(e) {
+		// 	var keyCode = e.keyCode;
+		// 	var keys = conf.keys;
+		// 	if (keyCode == keys.up) {
+		// 		sn.turn(conf.snake.directions.up);
+		// 	} else if (keyCode == keys.right) {
+		// 		sn.turn(conf.snake.directions.right);
 
-			} else if (keyCode == keys.down) {
-				sn.turn(conf.snake.directions.down);
+		// 	} else if (keyCode == keys.down) {
+		// 		sn.turn(conf.snake.directions.down);
 
-			} else if (keyCode == keys.left) {
-				sn.turn(conf.snake.directions.left);
-			}
-		});
+		// 	} else if (keyCode == keys.left) {
+		// 		sn.turn(conf.snake.directions.left);
+		// 	}
+		// });
 	},
 	unbind: function() {
 		this._list.length = 0;
 		console.log('game is over');
 	},
-	_list: []
+	map: null,
+	_list: [],
+	// 是否游戏已经开始
+	isRunning: false
 };
 
-var __ = function(){};
+var __ = function() {};
 __.prototype = game;
 
-var Game = function(){};
+var Game = function() {
+	this.init();
+};
 Game.prototype = new __();
 
-module.exports =Game;
+module.exports = Game;
