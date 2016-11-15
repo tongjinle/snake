@@ -3,8 +3,7 @@
 
 	conf.map = {
 		createInterval: 3,
-		// createInterval: 10,
-		size: 30
+		size:20
 	};
 
 	conf.snake = {
@@ -14,13 +13,8 @@
 			right: 1,
 			down: 2,
 			left: 3
-		},
-		size: 30
+		}
 
-	};
-
-	conf.fruit ={
-		size:30
 	};
 
 	conf.keys = {
@@ -30,6 +24,8 @@
 		left: 97
 
 
-	}
+	};
+
+	module.exports = conf;
 
 }).call(this);

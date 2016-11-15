@@ -1,28 +1,47 @@
 var server = require('http').createServer();
 var io = require('socket.io')(server);
+var Game = require('./Game');
 
-
-var chatList = [];
+var game = new Game();
 
 io.on('connection', function(client) {
-	console.log('a user connect...');
+	var canJoin = game.canJoin();
 
-	client.emit("enterroom",chatList);
+	var username;
+	if(canJoin){
+		username = "dino"+(+new Date);
+	}
 
-	client.on('event', function(data) {
-		console.log(data);
+	client.emit('afterConnect', {
+		flag: canJoin,
+		username:username
 	});
-	client.on('disconnect', function() {});
 
+	if (!game.canJoin()) {
+		return ;
+	}
 
+	game.joinUser(username);
+	// 广播
+	io.emit("user.connect",{username:username});
 
-	client.on("chat",function(data){
-		var content=[data.username,data.text].join(':');
-		console.log(content);
-		chatList.push(content);
+	// 玩家设置准备
+	client.on("ready", function(data) {
+		var username = data.username;
+		var isReady = data.isReady;
+		game.readyUser(username,isReady);
 
-		io.emit("chatmsg",content);
+		if(game.isRunning){
+			io.emit("user.gameStart");
+		}
 	});
+
+	client.on('disconnect', function() {
+		game.quitUser(username);
+		io.emit('user.disconnect',{username:username});
+	});
+
+
 });
 server.listen(3000, () => console.log('server start'));
 
