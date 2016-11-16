@@ -1,45 +1,89 @@
 var server = require('http').createServer();
 var io = require('socket.io')(server);
 var Game = require('./Game');
+var bindMgr = require('./bindMgr');
 
 var game = new Game();
 
 io.on('connection', function(client) {
-	var canJoin = game.canJoin();
+	console.log('123');
 
-	var username;
-	if(canJoin){
-		username = "dino"+(+new Date);
-	}
-
-	client.emit('afterConnect', {
-		flag: canJoin,
-		username:username
+	client.emit('user.preview', {
+		userList:userList,
+		isRunning:game.isRunning
 	});
 
-	if (!game.canJoin()) {
-		return ;
-	}
-
-	game.joinUser(username);
-	// 广播
-	io.emit("user.connect",{username:username});
+	
+	
+	// 玩家登陆
+	bindMgr.listen(client,'user.connection','user.login',function(){
+		client.on('user.login',function(data){
+			var username = data.username;
+			var isExist = function(user){return user.name == username;};
+			var canJoin = game.canJoin();
+			if(canJoin){
+				game.joinUser(username);
+				io.emit('user.login',{username:username});
+				// bindMgr.trigger('user.login');
+			}
+			client.emit('user.login',{flag:canJoin});
+		});
+	});
 
 	// 玩家设置准备
-	client.on("ready", function(data) {
-		var username = data.username;
-		var isReady = data.isReady;
-		game.readyUser(username,isReady);
+	bindMgr.listen(client,'user.login','user.gameStart',function(){
+		client.on("user.ready", function(data) {
+			var username = data.username;
+			var isReady = data.isReady;
+			game.readyUser(username,isReady);
 
-		if(game.isRunning){
-			io.emit("user.gameStart");
+			if(game.isRunning){
+				// 通知游戏开始
+				io.emit("user.gameStart");
+				// bindMgr.trigger(client,"user.gameStart");
+			}
+		});
+	});
+
+	// 定时发送游戏信息
+	var t;
+	bindMgr.listen(client,'user.gameStart','user.gameOver',function(){
+		var t = setInterval(function(){
+			if(!game.isRunning){
+				bindMgr.trigger(client,'user.gameOver');
+			}
+			var info =getGameinfo(game);
+			io.emit('user.gameinfo',info);
+		},100);
+
+		function getGameinfo(game){
+			return game.userList.map(function(user){
+				return user.snake;
+			});
 		}
 	});
 
-	client.on('disconnect', function() {
-		game.quitUser(username);
-		io.emit('user.disconnect',{username:username});
+
+
+	// 通知游戏结束
+	bindMgr.listen(client,'user.gameOver','user.gameOver',function(){
+		clearInterval(t);
+		io.emit('user.gameOver',game.winner);
 	});
+
+	bindMgr.listen(client,'user.connection','user.disconnect',function(){
+		client.on('disconnect', function() {
+			game.quitUser(username);
+			io.emit('user.disconnect',{username:username});
+
+			bindMgr.trigger('user.disconnect');
+		});
+	});
+
+
+	// 广播
+	// io.emit("user.connect",{username:username});
+	// bindMgr.trigger('user.connection');
 
 
 });

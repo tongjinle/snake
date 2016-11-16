@@ -19,9 +19,10 @@ var render;
 
 
 var game = {
-	canJoin: function() {
+	canJoin: function(username) {
 		var userList = this.userList;
-		return userList.length < conf.user.maxCount && !this.isRunning;
+		var isExist = function(user){return user.name == username;};
+		return userList.length < conf.user.maxCount && !this.isRunning && !userList.find(isExist);
 	},
 
 	joinUser: function(username) {
@@ -50,7 +51,7 @@ var game = {
 	},
 	_tryStart: function() {
 		// 用户人数满足 && 用户都已经准备完毕
-		if (this.userList.length >= conf.user.maxCount && !this.userList.filter(function(user) {
+		if (this.userList.length >= conf.user.minCount && !this.userList.filter(function(user) {
 				return !user.ready;
 			}).length) {
 			this.start();
@@ -74,6 +75,8 @@ var game = {
 	},
 
 	start: function() {
+		this.isRunning =true;
+
 		this.listen();
 
 		lastTs = +new Date;

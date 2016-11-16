@@ -1,0 +1,52 @@
+body{
+
+}
+
+#login{
+
+}
+
+#userList{
+	border-radius: 10px;
+	border:1px solid gray;
+	height: 360px;
+	width: 450px;
+	overflow: auto;
+	margin-bottom: 10px;
+}
+
+#userList .username{
+	float: left;
+	margin-right: 20px;
+}
+
+
+#userList .status{
+	float: left;
+	color: gray;
+}
+
+#userList .status.active{
+	color:red;
+}
+
+#input input{
+	padding: 2px;
+	margin-bottom: 10px;
+	width: 120px;
+}
+
+.btn{
+	background-color: steelblue;
+	text-align: center;
+	line-height: 30px;
+	height: 30px;
+	color: white;
+	width: 120px;
+	cursor: pointer;
+}
+
+
+#game{
+	display: none;
+}
