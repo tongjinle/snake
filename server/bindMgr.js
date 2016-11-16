@@ -17,9 +17,10 @@ var bindMgr = {
 			}
 
 			if(n.bindStatus == status){
-				currClient.on(status,callback);
+				// console.log('trigger '+status);
+				n.callback();
 			}else if(n.unbindStatus == status){
-				currClient.off(status,callback);
+				currClient.off(status,n.callback);
 			}
 		});
 	}

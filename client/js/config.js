@@ -29,9 +29,5 @@
 
 	};
 
-	conf.user ={
-		minCount:2,
-		maxCount:4
-	}
 
 }).call(this);

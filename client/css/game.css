@@ -15,14 +15,13 @@ body{
 	margin-bottom: 10px;
 }
 
-#userList .username{
+#userList .username,#userList .status{
 	float: left;
-	margin-right: 20px;
+	margin-left: 20px;
 }
 
 
 #userList .status{
-	float: left;
 	color: gray;
 }
 
@@ -44,6 +43,7 @@ body{
 	color: white;
 	width: 120px;
 	cursor: pointer;
+	margin-bottom: 10px;
 }
 
 

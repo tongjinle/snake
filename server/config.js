@@ -26,6 +26,13 @@
 
 	};
 
+	
+	conf.user ={
+		minCount:2,
+		maxCount:4
+	};
+
+	
 	module.exports = conf;
 
 }).call(this);

@@ -6,10 +6,16 @@ var bindMgr = require('./bindMgr');
 var game = new Game();
 
 io.on('connection', function(client) {
-	console.log('123');
+	console.log('');
+	console.log('');
+	console.log('');
+	console.log('');
+	console.log('==========================================');
+	console.log('someone connect');
+	console.log('==========================================');
 
 	client.emit('user.preview', {
-		userList:userList,
+		userList:game.userList,
 		isRunning:game.isRunning
 	});
 
@@ -17,14 +23,18 @@ io.on('connection', function(client) {
 	
 	// 玩家登陆
 	bindMgr.listen(client,'user.connection','user.login',function(){
+		console.log('bind user.login');
+
 		client.on('user.login',function(data){
 			var username = data.username;
+			console.log(username+' try login ...');
 			var isExist = function(user){return user.name == username;};
 			var canJoin = game.canJoin();
 			if(canJoin){
 				game.joinUser(username);
-				io.emit('user.login',{username:username});
-				// bindMgr.trigger('user.login');
+				console.log(game.userList);
+				io.emit('toAll.user.login',{username:username});
+				// bindMgr.trigger(client,'user.login');
 			}
 			client.emit('user.login',{flag:canJoin});
 		});
@@ -76,14 +86,14 @@ io.on('connection', function(client) {
 			game.quitUser(username);
 			io.emit('user.disconnect',{username:username});
 
-			bindMgr.trigger('user.disconnect');
+			bindMgr.trigger(client,'user.disconnect');
 		});
 	});
 
 
 	// 广播
-	// io.emit("user.connect",{username:username});
-	// bindMgr.trigger('user.connection');
+	// io.emit("user.connect");
+	bindMgr.trigger(client,'user.connection');
 
 
 });
