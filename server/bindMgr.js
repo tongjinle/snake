@@ -20,7 +20,7 @@ var bindMgr = {
 				// console.log('trigger '+status);
 				n.callback();
 			}else if(n.unbindStatus == status){
-				currClient.off(status,n.callback);
+				// currClient.off(status,n.callback);
 			}
 		});
 	}

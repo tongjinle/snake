@@ -6,13 +6,8 @@ var bindMgr = require('./bindMgr');
 var game = new Game();
 
 io.on('connection', function(client) {
-	console.log('');
-	console.log('');
-	console.log('');
-	console.log('');
-	console.log('==========================================');
+	
 	console.log('someone connect');
-	console.log('==========================================');
 
 	client.emit('user.preview', {
 		userList:game.userList,
@@ -29,12 +24,12 @@ io.on('connection', function(client) {
 			var username = data.username;
 			console.log(username+' try login ...');
 			var isExist = function(user){return user.name == username;};
-			var canJoin = game.canJoin();
+			var canJoin = game.canJoin(username);
 			if(canJoin){
+				client.username = username;
 				game.joinUser(username);
-				console.log(game.userList);
-				io.emit('toAll.user.login',{username:username});
-				// bindMgr.trigger(client,'user.login');
+				io.emit('toAll.user.login',{username:username,status:false});
+				bindMgr.trigger(client,'user.login');
 			}
 			client.emit('user.login',{flag:canJoin});
 		});
@@ -42,15 +37,28 @@ io.on('connection', function(client) {
 
 	// 玩家设置准备
 	bindMgr.listen(client,'user.login','user.gameStart',function(){
+		console.log('bind user.ready');
 		client.on("user.ready", function(data) {
+			console.log('enter user.ready');
 			var username = data.username;
 			var isReady = data.isReady;
 			game.readyUser(username,isReady);
 
+			var user = game.userList.find(function(user){return user.name == username;});
+			var flag = !user || user.status != isReady;
+
+			client.emit('user.ready',{flag:flag});
+			if (flag) {
+				var username = user.name;
+				var status = user.ready;
+
+				io.emit('toAll.user.ready',{username:username,status:status});
+			}
+
 			if(game.isRunning){
 				// 通知游戏开始
 				io.emit("user.gameStart");
-				// bindMgr.trigger(client,"user.gameStart");
+				bindMgr.trigger(client,"user.gameStart");
 			}
 		});
 	});
@@ -83,8 +91,12 @@ io.on('connection', function(client) {
 
 	bindMgr.listen(client,'user.connection','user.disconnect',function(){
 		client.on('disconnect', function() {
-			game.quitUser(username);
-			io.emit('user.disconnect',{username:username});
+			var username = client.username;
+			console.log(username);
+			if(username){
+				game.quitUser(username);
+				io.emit('toAll.user.disconnect',{username:username});
+			}
 
 			bindMgr.trigger(client,'user.disconnect');
 		});
@@ -97,33 +109,12 @@ io.on('connection', function(client) {
 
 
 });
-server.listen(3000, () => console.log('server start'));
-
-
-
-// var io = require('socket.io')();
-// io.on('connection', function(client){
-// 	console.log('io is runing');
-// 	client.on('event', function(data) {});
-// 	client.on('disconnect', function() {});
-// });
-// io.listen(3000,function(){
-// 	console.log('io is runing');
-// });
-
-
-// var app = require('express')();
-// var http = require('http').Server(app);
-// var io = require('socket.io')(http);
-
-// app.get('/', function(req, res){
-//   res.sendfile('index.html');
-// });
-
-// io.on('connection', function(socket){
-//   console.log('a user connected');
-// });
-
-// http.listen(3000, function(){
-//   console.log('listening on *:3000');
-// });
+server.listen(3000, () => {
+	console.log('');
+	console.log('');
+	console.log('');
+	console.log('');
+	console.log('==========================================');
+	console.log('server start');
+	console.log('==========================================');
+});

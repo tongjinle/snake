@@ -13,20 +13,34 @@ body{
 	width: 450px;
 	overflow: auto;
 	margin-bottom: 10px;
+	padding-top: 10px;
+}
+
+#userList .row{
+	overflow: hidden;
+	margin-bottom: 20px;
 }
 
 #userList .username,#userList .status{
 	float: left;
 	margin-left: 20px;
+	width: 160px;
+	height: 40px;
+	line-height: 40px;
+	text-align: center;;
+	border-radius: 5px;
+	color: white;
+	background-color: steelblue;
+	font-size: 24px
 }
 
 
 #userList .status{
-	color: gray;
+	color: red;
 }
 
 #userList .status.active{
-	color:red;
+	color:green;
 }
 
 #input input{

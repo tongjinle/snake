@@ -16,10 +16,11 @@ $(function(){
 
 	$('#ready').click(function(){
 		var me = glob.userList.find(function(user){return user.name == glob.me;});
+		var status = !me.status;
 		if(me){
 			socket.emit('user.ready',{
 				username:me.name,
-				isReady:me.status
+				isReady:status
 			});
 		}else{
 			alert("join first !!");
@@ -40,14 +41,64 @@ $(function(){
 
 	socket.on('user.login',function(data){
 		console.log(data);
-		if(data.flag){
-			glob.userList.push({
-				name:glob.me,
-				status:false
-			});
+		if(!data.flag){
+			alert('login fail ... ');
+		}
+	});
 
+	socket.on('toAll.user.login',function(data){
+		var username = data.username;
+		var status = data.status;
+
+		glob.userList.push({
+			name:username,
+			status:status
+		});
+
+		renderUserList();
+	});
+
+
+	socket.on('user.ready',function (data) {
+		var flag = data.flag;
+		var username = data.data.username;
+		var status = data.data.status;
+
+		if(!flag){
+			alert('set status fail');
+		}else{
+			var user = glob.userList.find(function(user){return user.name == username;});
+			user.status = status;
 			renderUserList();
 		}
+
+	});
+
+
+	socket.on('toAll.user.ready',function (data) {
+		var username = data.username;
+		var status = data.status;
+
+		var user = glob.userList.find(function(user){return user.name == username;});
+		user.status = status;
+		renderUserList();
+
+	});
+
+
+	socket.on('user.gameStart',function(){
+		$('#login').slideUp(false);
+		$('#game').sildeDown(true);
+
+	});
+
+
+	socket.on('toAll.user.disconnect',function(data){
+		console.log(123);
+		var username = data.username;
+		glob.userList = glob.userList.filter(function(user){return user.name != username;});
+
+		renderUserList();
 	});
 
 
@@ -58,7 +109,9 @@ function renderUserList(){
 		$userList.empty();
 
 	glob.userList.forEach(function(user){
-		$userList.append('<div class="username">'+user.name+'</div>');
-		$userList.append('<div class="status '+(user.status ? 'active' : '')+'">'+(user.status?'已准备':'未准备')+'</div>');
+		var $row = $('<div/>').addClass('row');
+		$row.append('<div class="username">'+user.name+'</div>');
+		$row.append('<div class="status '+(user.status ? 'active' : '')+'">'+(user.status?'已准备':'未准备')+'</div>');
+		$userList.append($row);
 	});
 }

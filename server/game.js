@@ -36,7 +36,9 @@ var game = {
 		});
 	},
 	quitUser: function(username) {
-
+		this.userList = this.userList.filter(function(user){
+			return user.name != username;
+		});
 	},
 	readyUser: function(username, ready) {
 		var user = this.userList.find(function(user) {
