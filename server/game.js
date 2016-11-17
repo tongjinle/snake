@@ -82,7 +82,7 @@ var game = {
 		this.listen();
 
 		lastTs = +new Date;
-		setInterval(function() {
+		this._timer = setInterval(function() {
 			var currTs = +new Date;
 			var dt = currTs - lastTs;
 			lastTs = currTs;

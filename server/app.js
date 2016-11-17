@@ -57,7 +57,7 @@ io.on('connection', function(client) {
 
 			if(game.isRunning){
 				// 通知游戏开始
-				io.emit("user.gameStart");
+				io.emit("toAll.user.gameStart");
 				bindMgr.trigger(client,"user.gameStart");
 			}
 		});
@@ -71,14 +71,20 @@ io.on('connection', function(client) {
 				bindMgr.trigger(client,'user.gameOver');
 			}
 			var info =getGameinfo(game);
-			io.emit('user.gameinfo',info);
+			io.emit('toAll.user.gameinfo',{info:info});
 		},100);
 
 		function getGameinfo(game){
 			return game.userList.map(function(user){
-				return user.snake;
+				return user.sn;
 			});
 		}
+	});
+
+
+	// 接受来自玩家的操作信息
+	bindMgr.listen(client,'user.gameStart','user.gameOver',function(){
+		
 	});
 
 

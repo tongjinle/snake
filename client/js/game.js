@@ -32,7 +32,12 @@ $(function(){
 	});
 
 	socket.on('user.preview',function(data){
-		glob.userList = data.userList;
+		glob.userList = data.userList.map(function(user){
+			return {
+				name:user.name,
+				status:user.ready
+			};
+		});
 		glob.isRunning = data.isRunning;
 
 		renderUserList();
@@ -61,15 +66,9 @@ $(function(){
 
 	socket.on('user.ready',function (data) {
 		var flag = data.flag;
-		var username = data.data.username;
-		var status = data.data.status;
 
 		if(!flag){
 			alert('set status fail');
-		}else{
-			var user = glob.userList.find(function(user){return user.name == username;});
-			user.status = status;
-			renderUserList();
 		}
 
 	});
@@ -86,10 +85,17 @@ $(function(){
 	});
 
 
-	socket.on('user.gameStart',function(){
-		$('#login').slideUp(false);
-		$('#game').sildeDown(true);
+	socket.on('toAll.user.gameStart',function(){
+		$('#login').slideUp();
+		$('#game').slideDown();
 
+	});
+
+
+	socket.on('toAll.user.gameinfo',function(data){
+		var snakeList = data.info;
+
+		console.log(snakeList);
 	});
 
 
