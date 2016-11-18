@@ -17,15 +17,7 @@
 
 	};
 
-	conf.keys = {
-		up: 119,
-		right: 100,
-		down: 115,
-		left: 97
-
-
-	};
-
+	
 	
 	conf.user ={
 		minCount:1,

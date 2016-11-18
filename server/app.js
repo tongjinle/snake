@@ -2,6 +2,7 @@ var server = require('http').createServer();
 var io = require('socket.io')(server);
 var Game = require('./Game');
 var bindMgr = require('./bindMgr');
+var conf = require('./config');
 
 var game = new Game();
 
@@ -116,7 +117,11 @@ io.on('connection', function(client) {
 
 	// 接受来自玩家的操作信息
 	bindMgr.listen(client, 'user.gameStart', 'user.gameOver', function() {
-
+		client.on('user.action',function(data){
+			var dire = conf.snake.directions[data.direction];
+			var user = game.userList.find(function(user){return user.name == client.username;});
+			user.sn.turn(dire);
+		});
 	});
 
 

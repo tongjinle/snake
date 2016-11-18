@@ -41,7 +41,6 @@ var conf = require('./config');
 			return;
 		}
 
-		console.log('sn move ...');
 
 		var next = {
 			x: this.head.x,
@@ -55,6 +54,8 @@ var conf = require('./config');
 			next.y++;
 		} else if (this.direction == directions.left) {
 			next.x--;
+		}else {
+			throw this.direction;
 		}
 
 		// 记录上一个最后节点的位置
@@ -65,6 +66,8 @@ var conf = require('./config');
 			x: finalNode.x,
 			y: finalNode.y
 		};
+
+		console.log('sn move ...',this.head);
 		/* END */
 
 

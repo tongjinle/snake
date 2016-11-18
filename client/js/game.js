@@ -132,6 +132,22 @@ $(function() {
 		renderUserList();
 	});
 
+	listen();
+
+
+	function listen(){
+		$(window).on('keypress',function(e){
+			var keyCode = e.keyCode;
+			var flag = false;
+			for(var i in conf.keys){
+				if(conf.keys[i] == keyCode){
+					flag = true;
+					socket.emit('user.action',{direction:i});
+					break;
+				}
+			}
+		})
+	}
 });
 
 // 因为是jquery的dom操作,因此不放在render.js中
