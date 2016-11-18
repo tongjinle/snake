@@ -7,7 +7,7 @@
 	};
 
 	conf.snake = {
-		speed: 800,
+		speed: 100,
 		directions: {
 			up: 0,
 			right: 1,
@@ -28,7 +28,7 @@
 
 	
 	conf.user ={
-		minCount:2,
+		minCount:1,
 		maxCount:4
 	};
 

@@ -10,7 +10,6 @@ var interval = 1000 / frames;
 var lastTs = null;
 var tick = 0;
 
-var map
 
 var sn;
 var map;
@@ -29,16 +28,20 @@ var game = {
 		var userList = this.userList;
 
 		var sn = this._createSnake();
-		userList.push({
+		var user = {
 			name: username,
 			sn: sn,
 			ready: false
-		});
+		};
+		user.sn.setMap(this.map);
+		userList.push(user);
 	},
 	quitUser: function(username) {
 		this.userList = this.userList.filter(function(user){
 			return user.name != username;
 		});
+
+		this._tryStop();
 	},
 	readyUser: function(username, ready) {
 		var user = this.userList.find(function(user) {
@@ -57,6 +60,11 @@ var game = {
 				return !user.ready;
 			}).length) {
 			this.start();
+		}
+	},
+	_tryStop:function(){
+		if(this.userList.length<=conf.user.stopCount){
+			this.Stop();
 		}
 	},
 	_createSnake: function() {
@@ -79,7 +87,15 @@ var game = {
 	start: function() {
 		this.isRunning =true;
 
-		this.listen();
+		// this.listen();
+
+		// 绑snake的运动
+		this.schedule(function () {
+			this.userList.forEach(function(user){
+				var sn = user.sn;
+				sn.isAlive && sn.move();
+			});
+		}.bind(this),500);
 
 		lastTs = +new Date;
 		this._timer = setInterval(function() {
@@ -89,6 +105,11 @@ var game = {
 			this.update(dt);
 		}.bind(this), interval);
 	},
+
+	stop:function(){
+		this.isRunning = false;
+	},
+
 	init: function() {
 		this.userList = [];
 		this.isRunning = false;
