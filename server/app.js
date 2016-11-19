@@ -100,7 +100,7 @@ io.on('connection', function(client) {
 			io.emit('toAll.user.gameinfo', {
 				info: info
 			});
-		}, 100);
+		}, 50);
 
 		function getGameinfo(game) {
 			var snakeList = game.userList.map(function(user) {

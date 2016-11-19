@@ -7,13 +7,14 @@
 	};
 
 	conf.snake = {
-		speed: 100,
+		speed: 4,
 		directions: {
 			up: 0,
 			right: 1,
 			down: 2,
 			left: 3
-		}
+		},
+		pathInterval:1000
 
 	};
 

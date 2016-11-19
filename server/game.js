@@ -93,9 +93,9 @@ var game = {
 		this.schedule(function () {
 			this.userList.forEach(function(user){
 				var sn = user.sn;
-				sn.isAlive && sn.move();
+				sn.isAlive && sn.moveByTime(50);
 			});
-		}.bind(this),500);
+		}.bind(this),50);
 
 		lastTs = +new Date;
 		this._timer = setInterval(function() {

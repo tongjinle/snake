@@ -10,6 +10,7 @@ var bindMgr = {
 		});
 	},
 	trigger:function(client,status){
+		console.log('trigger '+status);
 		this._list.forEach(function(n){
 			var currClient = n.client;
 			if(!currClient || currClient!=client){

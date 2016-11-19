@@ -28,6 +28,13 @@ var conf = require('./config');
 		this._lastPosi = null;
 		// 移动过位置的方向
 		this._movedDire = this.direction;
+
+
+		// 移动的路径
+		// speed表示1ms移动的路径
+		// 如果超过pathInterval,则让snake移动一格
+		// 如果转向,则清0
+		this._moved = 0;
 	}
 
 	var handle = Snake.prototype;
@@ -35,6 +42,16 @@ var conf = require('./config');
 	handle.setMap = function(map) {
 		this.map = map;
 	}
+
+	// dt表示过去的时间
+	handle.moveByTime = function(dt){
+		var pathInterval = conf.snake.pathInterval;
+		this._moved += dt * this.speed;
+		if(this._moved>=pathInterval){
+			this._moved -=pathInterval;
+			this.move();
+		}
+	};
 
 	handle.move = function() {
 		if (!this.isAlive) {
@@ -127,8 +144,12 @@ var conf = require('./config');
 
 	// 转向
 	handle.turn = function(dire) {
+		var _lastDire = this.direction;
 		if (!this.tails.length || (dire + this._movedDire) % 2) {
 			this.direction = dire;
+		}
+		if(_lastDire != this.direction){
+			// this._moved = 0;
 		}
 	};
 
