@@ -6,15 +6,37 @@ var conf = require('./config');
 
 var game = new Game();
 
+// add AI snake 
+game.addAI('==AI-1==');
+var toJSON = {
+	user: function(user) {
+		return {
+			name: user.name,
+			ready: user.ready,
+			isAI: user.isAI
+		};
+	},
+	snake: function(sn) {
+		return {
+			head: sn.head,
+			tails: sn.tails,
+			direction: sn.direction,
+			speed: sn.speed,
+			isAlive:sn.isAlive
+		};
+	}
+};
+
 io.on('connection', function(client) {
 
 	console.log('someone connect');
 
 	client.emit('user.preview', {
-		userList: game.userList,
+		userList: game.userList.map(toJSON.user),
 		isRunning: game.isRunning
 	});
 
+	console.log('after emit preview');
 
 
 	// 玩家登陆
@@ -69,7 +91,7 @@ io.on('connection', function(client) {
 					status: status
 				});
 			}
-
+			console.log(game.isRunning);
 			if (game.isRunning) {
 				// 通知游戏开始
 				io.emit('toAll.user.gameStart');
@@ -90,17 +112,20 @@ io.on('connection', function(client) {
 			}
 		};
 		io.emit('toAll.user.basicGameinfo', info);
+		console.log('basicGameinfo ==> ',info);
 
 
-		var t = setInterval(function() {
+		t = setInterval(function() {
 			if (!game.isRunning) {
 				bindMgr.trigger(client, 'user.gameOver');
 			}
 			var info = getGameinfo(game);
+			// console.log('gameinfo  ==> ',info);
 			io.emit('toAll.user.gameinfo', {
 				info: info
 			});
 		}, 50);
+
 
 		function getGameinfo(game) {
 			var snakeList = game.userList.map(function(user) {
@@ -108,7 +133,7 @@ io.on('connection', function(client) {
 			});
 
 			return {
-				snakeList: snakeList,
+				snakeList: snakeList.map(toJSON.snake),
 				fruit: game.map.fruit
 			};
 		}
@@ -128,8 +153,9 @@ io.on('connection', function(client) {
 
 	// 通知游戏结束
 	bindMgr.listen(client, 'user.gameOver', 'user.gameOver', function() {
+		console.log('=============clearInterval==============')
 		clearInterval(t);
-		io.emit('user.gameOver', game.winner);
+		io.emit('toAll.user.gameOver', game.winner);
 	});
 
 	bindMgr.listen(client, 'user.connection', 'user.disconnect', function() {
@@ -149,7 +175,6 @@ io.on('connection', function(client) {
 
 
 	// 广播
-	// io.emit("user.connect");
 	bindMgr.trigger(client, 'user.connection');
 
 

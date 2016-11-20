@@ -1,12 +1,3 @@
-// head
-// tails
-// direction
-// speed
-
-// move
-// eat
-// turn
-
 var conf = require('./config');
 
 (function() {
@@ -19,7 +10,6 @@ var conf = require('./config');
 		};
 
 		this.isAlive = true;
-		this.map = null;
 		this.tails = [];
 		this.direction = directions.right;
 		this.speed = conf.snake.speed;
@@ -35,13 +25,16 @@ var conf = require('./config');
 		// 如果超过pathInterval,则让snake移动一格
 		// 如果转向,则清0
 		this._moved = 0;
+
+
 	}
 
 	var handle = Snake.prototype;
 
-	handle.setMap = function(map) {
-		this.map = map;
-	}
+
+	handle.setGame = function(game){
+		this.game = game;
+	};
 
 	// dt表示过去的时间
 	handle.moveByTime = function(dt){
@@ -57,7 +50,6 @@ var conf = require('./config');
 		if (!this.isAlive) {
 			return;
 		}
-
 
 		var next = {
 			x: this.head.x,
@@ -104,7 +96,7 @@ var conf = require('./config');
 		/* END */
 
 		// 超出边界就死
-		if (this._isOutOfMap()) {
+		if (this.game.ask('#isOutOfMap',this.head)) {
 			this.die();
 			return;
 		}
@@ -119,16 +111,19 @@ var conf = require('./config');
 		}
 
 		// 吃到水果
-		if (this.map.fruit && this.head.x == this.map.fruit.x && this.head.y == this.map.fruit.y) {
+		if (this.game.ask('#isFruit',this.head)){
 			this.eat();
 		}
+
+
 
 	};
 
 	// 死亡
 	handle.die = function() {
-			this.isAlive = false;
-		}
+		this.isAlive = false;
+		this.game.ask('#snakeDie',this);
+	};
 		// 吃东西
 	handle.eat = function() {
 		console.log('snake has eat fruit');
@@ -139,7 +134,7 @@ var conf = require('./config');
 		this.tails.push(node);
 
 		// 清理水果
-		this.map.fruit = null;
+		this.game.ask('#eatFruit');
 	};
 
 	// 转向
@@ -153,11 +148,43 @@ var conf = require('./config');
 		}
 	};
 
-	// 是否超出map
-	handle._isOutOfMap = function() {
-		return this.head.x < 0 || this.head.x >= this.map.width || this.head.y < 0 || this.head.y >= this.map.height;
+
+	// ai
+	// 策略:
+	// 当前方向的前方缺少5个连续空格的时候
+	// 4个方向中(除去回退方向),连续空格最多的方向是选择的方向
+	handle.ai = function(){
+		console.log('ai');
+		// return;
+		console.log('this._hasAiEnoughSpace(5)',this._hasAiEnoughSpace(5)); 
+		if(this._hasAiEnoughSpace(5)){
+			return;
+		}
+		this.direction = this._getAiDirection(); 
 	};
 
+	handle._getSpaceCountByDirection = function(posi,dire){
+		return  this.game.ask('#getSpaceCountByDirection',posi,dire);
+	};
+
+	// 前方是否有N个空格
+	handle._hasAiEnoughSpace = function(n) {
+		return this._getSpaceCountByDirection(this.head,this.direction)>=n;
+	};
+	
+	handle._getAiDirection = function(){
+		var count = -1;
+		var direction = this.direction;
+		for(var dire in conf.directions){
+			var spaceCount = this.game.ask('#getSpaceCountByDirection',this.head,dire);
+			console.log('_getAiDirection',dire,spaceCount);
+			if(count<spaceCount){
+				count = spaceCount;
+				direction = dire;
+			}
+		}
+		return direction;
+	};
 
 
 	this.Snake = Snake;

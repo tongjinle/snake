@@ -9,6 +9,9 @@ var glob = {
 var render;
 
 $(function() {
+	$('input').val('aaa');
+
+
 	$('#join').click(function() {
 		var username = $('input').val();
 
@@ -34,7 +37,7 @@ $(function() {
 	});
 
 	$('#back').click(function() {
-
+		
 	});
 
 	socket.on('user.preview', function(data) {

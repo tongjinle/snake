@@ -21,7 +21,8 @@
 	
 	
 	conf.user ={
-		minCount:1,
+		stopCount:1,
+		minCount:2,
 		maxCount:4
 	};
 
