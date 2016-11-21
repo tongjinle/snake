@@ -113,6 +113,11 @@ var game = {
 			});
 		}.bind(this),50);
 
+		// 绑定createFruit
+		this.schedule(function(){
+			this.map.createFruit();
+		}.bind(this),conf.map.createInterval);
+
 		lastTs = +new Date;
 		this._timer = setInterval(function() {
 			var currTs = +new Date;

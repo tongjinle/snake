@@ -2,7 +2,7 @@
 	var conf = this.conf = this.conf || {};
 
 	conf.map = {
-		createInterval: 3,
+		createInterval: 2000,
 		size:20
 	};
 

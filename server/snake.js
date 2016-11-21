@@ -76,7 +76,7 @@ var conf = require('./config');
 			y: finalNode.y
 		};
 
-		console.log('sn move ...',this.head);
+		// console.log('sn move ...',this.head);
 		/* END */
 
 
@@ -154,12 +154,9 @@ var conf = require('./config');
 	// 当前方向的前方缺少5个连续空格的时候
 	// 4个方向中(除去回退方向),连续空格最多的方向是选择的方向
 	handle.ai = function(){
-		// return;
-		// console.log('this._hasAiEnoughSpace(5)',this._hasAiEnoughSpace(5)); 
 		if(this._hasAiEnoughSpace(5)){
 			return;
 		}
-		console.log('no enough space');
 		this.direction = this._getAiDirection(); 
 	};
 
@@ -178,7 +175,6 @@ var conf = require('./config');
 		for(var i in conf.snake.directions){
 			var dire = conf.snake.directions[i];
 			var spaceCount = this.game.ask('#getSpaceCountByDirection',this.head,dire);
-			console.log('_getAiDirection',dire,spaceCount);
 			if(count<spaceCount){
 				count = spaceCount;
 				direction = dire;
