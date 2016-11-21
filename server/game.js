@@ -292,7 +292,7 @@ __.prototype = game;
 var Game = function() {
 	this.init();
 	// add AI snake 
-	this.addAI('==AI-1==');
+	// this.addAI('==AI-1==');
 };
 Game.prototype = new __();
 
