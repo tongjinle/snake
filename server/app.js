@@ -3,29 +3,13 @@ var io = require('socket.io')(server);
 var Game = require('./Game');
 var bindMgr = require('./bindMgr');
 var conf = require('./config');
+var toJSON = require('./toJSON');
 
 var game = new Game();
 
 // add AI snake 
 game.addAI('==AI-1==');
-var toJSON = {
-	user: function(user) {
-		return {
-			name: user.name,
-			ready: user.ready,
-			isAI: user.isAI
-		};
-	},
-	snake: function(sn) {
-		return {
-			head: sn.head,
-			tails: sn.tails,
-			direction: sn.direction,
-			speed: sn.speed,
-			isAlive:sn.isAlive
-		};
-	}
-};
+
 
 io.on('connection', function(client) {
 
@@ -128,13 +112,15 @@ io.on('connection', function(client) {
 
 
 		function getGameinfo(game) {
-			var snakeList = game.userList.map(function(user) {
-				return user.sn;
+			var userList = game.userList.map(function(user) {
+				return {
+					username:user.name,	
+					sn: toJSON.snake(user.sn),
+				};
 			});
-
 			return {
-				snakeList: snakeList.map(toJSON.snake),
-				fruit: game.map.fruit
+				userList:userList,
+				fruit:game.map.fruit
 			};
 		}
 	});
@@ -155,7 +141,7 @@ io.on('connection', function(client) {
 	bindMgr.listen(client, 'user.gameOver', 'user.gameOver', function() {
 		console.log('=============clearInterval==============')
 		clearInterval(t);
-		io.emit('toAll.user.gameOver', game.winner);
+		io.emit('toAll.user.gameOver', {winner:game.winner});
 	});
 
 	bindMgr.listen(client, 'user.connection', 'user.disconnect', function() {

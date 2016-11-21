@@ -122,7 +122,24 @@ $(function() {
 	socket.on('toAll.user.gameinfo', function(data) {
 		var info = data.info;
 		info.map = glob.gameInfo.map;
+		info.snakeList = info.userList.map(function(user){
+			var username = user.username;
+			var sn = user.sn;
+			sn.color = sn.tailColor = username == glob.me ? 'steelblue' : 'orange';
+			return sn;
+		});
 		render.renderGame(info);
+	});
+
+	socket.on('toAll.user.gameOver',function(data){
+		var winner = data.winner;
+		setTimeout(function(){
+			if(winner == glob.me){
+				alert('you win !!')
+			}else{
+				alert('you lose ... the winner is '+winner);
+			}
+		},500);
 	});
 
 

@@ -1,6 +1,3 @@
-// 60 frames
-// 16.6ms
-
 var conf = require('./config');
 var Snake = require('./snake');
 var GameMap = require('./map');
@@ -41,6 +38,7 @@ var game = {
 		var user = this.joinUser(ainame);
 		user.isAI = true;
 		user.ready = true;
+		user.sn.speed = 10;
 		// console.log(user);
 		return user;
 	},
@@ -102,16 +100,14 @@ var game = {
 	start: function() {
 		this.isRunning =true;
 
-		// this.listen();
-
 		// 绑snake的运动
 		this.schedule(function () {
 			this.userList.forEach(function(user){
 				var sn = user.sn;
-				if(user.isAI){
-					sn.ai();
-				}
 				if(sn.isAlive){
+					if(user.isAI){
+						sn.ai();
+					}
 					sn.moveByTime(50);
 				}
 			});
@@ -128,6 +124,16 @@ var game = {
 
 	stop:function(){
 		this.isRunning = false;
+		// 停止下面所有snake的动作
+		console.log(this.userList.map(function(user){
+			return require('./toJSON').user(user);
+		}));
+		this.winner = this.userList.find(function(user){
+			return user.sn.isAlive;
+		}).name;
+		// 清理schedule
+		this._list = [];
+		clearInterval(this._timer);
 	},
 
 	init: function() {
@@ -155,23 +161,6 @@ var game = {
 			interval: interval,
 			tick: 0
 		});
-	},
-	listen: function() {
-		// $(window).bind('keypress', function(e) {
-		// 	var keyCode = e.keyCode;
-		// 	var keys = conf.keys;
-		// 	if (keyCode == keys.up) {
-		// 		sn.turn(conf.snake.directions.up);
-		// 	} else if (keyCode == keys.right) {
-		// 		sn.turn(conf.snake.directions.right);
-
-		// 	} else if (keyCode == keys.down) {
-		// 		sn.turn(conf.snake.directions.down);
-
-		// 	} else if (keyCode == keys.left) {
-		// 		sn.turn(conf.snake.directions.left);
-		// 	}
-		// });
 	},
 	unbind: function() {
 		this._list.length = 0;
@@ -216,8 +205,8 @@ var askDict = {
 			nextPosi = {x:x,y:y};
 
 			
-			console.log('isOutOfMap.........');
-			console.log(dire,nextPosi,this.ask('#isOutOfMap',nextPosi));
+			// console.log('isOutOfMap.........');
+			// console.log(dire,nextPosi,this.ask('#isOutOfMap',nextPosi));
 			if(this.ask('#isOutOfMap',nextPosi)){
 				break;
 			}
@@ -258,6 +247,7 @@ var askDict = {
 	'#snakeDie':function(){
 		console.log('snake die...');
 		this._tryStop();
+
 	}
 };
 

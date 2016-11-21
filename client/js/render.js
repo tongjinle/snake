@@ -51,9 +51,9 @@
 	handler._renderSnake = function(snakeInfo) {
 		var snakeSize = conf.snake.size;
 		var sn = snakeInfo;
-		this.rect(sn.head.x * snakeSize, sn.head.y * snakeSize, snakeSize, snakeSize, 'red');
+		this.rect(sn.head.x * snakeSize, sn.head.y * snakeSize, snakeSize, snakeSize, sn.color);
 		sn.tails.forEach(function(tail) {
-			this.rect(tail.x * snakeSize, tail.y * snakeSize, snakeSize, snakeSize, 'pink');
+			this.rect(tail.x * snakeSize, tail.y * snakeSize, snakeSize, snakeSize, sn.tailColor);
 		});
 	};
 
