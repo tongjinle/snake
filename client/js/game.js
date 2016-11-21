@@ -37,7 +37,8 @@ $(function() {
 	});
 
 	$('#back').click(function() {
-		
+		$('#login').slideDown();
+		$('#game').slideUp();
 	});
 
 	socket.on('user.preview', function(data) {
@@ -139,7 +140,17 @@ $(function() {
 			}else{
 				alert('you lose ... the winner is '+winner);
 			}
+
 		},500);
+	});
+
+	socket.on('toAll.user.gameRestart',function(data){
+		glob.userList = data.userList.map(function(user){
+			user.status = user.ready;
+			return user;
+		});
+		glob.isRunning = false;
+		renderUserList(glob.userList);
 	});
 
 
@@ -149,7 +160,7 @@ $(function() {
 			return user.name != username;
 		});
 
-		renderUserList();
+		renderUserList(glob.userList);
 	});
 
 	listen();

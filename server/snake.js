@@ -110,6 +110,12 @@ var conf = require('./config');
 			return;
 		}
 
+		// 吃到其他snake也会死
+		if(this.game.ask('#isOtherSnake',this,this.head)){
+			this.die();
+			return;
+		}
+
 		// 吃到水果
 		if (this.game.ask('#isFruit',this.head)){
 			this.eat();
@@ -133,6 +139,8 @@ var conf = require('./config');
 		};
 		this.tails.push(node);
 
+		this.speed = Math.max(this.speed+1,conf.snake.maxSpeed);
+
 		// 清理水果
 		this.game.ask('#eatFruit');
 	};
@@ -144,7 +152,7 @@ var conf = require('./config');
 			this.direction = dire;
 		}
 		if(_lastDire != this.direction){
-			// this._moved = 0;
+			this._moved = 0;
 		}
 	};
 

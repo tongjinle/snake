@@ -7,8 +7,7 @@ var toJSON = require('./toJSON');
 
 var game = new Game();
 
-// add AI snake 
-game.addAI('==AI-1==');
+
 
 
 io.on('connection', function(client) {
@@ -139,9 +138,13 @@ io.on('connection', function(client) {
 
 	// 通知游戏结束
 	bindMgr.listen(client, 'user.gameOver', 'user.gameOver', function() {
-		console.log('=============clearInterval==============')
+		console.log('=============clearInterval==============');
 		clearInterval(t);
+		// 通知游戏结束
 		io.emit('toAll.user.gameOver', {winner:game.winner});
+		// 重新开启一个game
+		io.emit('toAll.user.gameRestart',{userList:game.userList.map(toJSON.user)});
+
 	});
 
 	bindMgr.listen(client, 'user.connection', 'user.disconnect', function() {

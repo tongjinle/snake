@@ -38,7 +38,7 @@ var game = {
 		var user = this.joinUser(ainame);
 		user.isAI = true;
 		user.ready = true;
-		user.sn.speed = 10;
+		user.sn.speed = conf.snake.aiSpeed;
 		// console.log(user);
 		return user;
 	},
@@ -136,6 +136,18 @@ var game = {
 		this.winner = this.userList.find(function(user){
 			return user.sn.isAlive;
 		}).name;
+		// 清理userList,所有非AI玩家的状态设置成false（未准备）
+		this.userList = this.userList.map(function(user){
+			user.sn = this._createSnake();
+			if(user.isAI){
+				user.sn.speed = conf.snake.aiSpeed;
+				user.ready = true;
+			}else{
+				user.sn.speed = conf.snake.speed;
+				user.ready = false;
+			}
+			return user;
+		}.bind(this));
 		// 清理schedule
 		this._list = [];
 		clearInterval(this._timer);
@@ -236,10 +248,28 @@ var askDict = {
 		var x = posi.x;
 		var y = posi.y;
 		return !!this.userList.find(function(user){
-			var posiList = [user.sn.head].concat(user.sn.tails);
+			var sn = user.sn;
+			var posiList = [sn.head].concat(sn.tails);
 			return !!posiList.find(function(posi){
 				return posi.x == x && posi.y == y;
 			});
+		});
+	},
+	'#isOtherSnake':function(snake,posi){
+		var x = posi.x;
+		var y = posi.y;
+		return !!this.userList.find(function(user){
+			var sn = user.sn;
+			if(sn == snake){
+				return false;
+			}
+			if(sn.isAlive){
+				var posiList = [sn.head].concat(sn.tails);
+				return !!posiList.find(function(posi){
+					return posi.x == x && posi.y == y;
+				});
+			}
+
 		});
 	},
 	// 是否是水果的坐标
@@ -261,6 +291,8 @@ __.prototype = game;
 
 var Game = function() {
 	this.init();
+	// add AI snake 
+	this.addAI('==AI-1==');
 };
 Game.prototype = new __();
 

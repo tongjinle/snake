@@ -8,6 +8,8 @@
 
 	conf.snake = {
 		speed: 4,
+		maxSpeed:8,
+		aiSpeed:10,
 		directions: {
 			up: 0,
 			right: 1,
