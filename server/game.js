@@ -81,10 +81,11 @@ var game = {
 		}
 	},
 	_createSnake: function() {
-		var sn ;
+		var sn;
+		var margin =4;
 		while (1) {
-			var x = Math.floor(Math.random() * this.map.width);
-			var y = Math.floor(Math.random() * this.map.height);
+			var x = margin+Math.floor(Math.random() * (this.map.width-margin));
+			var y = margin +Math.floor(Math.random() * (this.map.height-margin));
 			isExist = this.userList.find(function(user) {
 				return user.sn.head.x == x && user.sn.head.y == y;
 			});
@@ -258,7 +259,7 @@ var askDict = {
 	'#isOtherSnake':function(snake,posi){
 		var x = posi.x;
 		var y = posi.y;
-		return !!this.userList.find(function(user){
+		var flag = !!this.userList.find(function(user){
 			var sn = user.sn;
 			if(sn == snake){
 				return false;
@@ -271,6 +272,10 @@ var askDict = {
 			}
 
 		});
+		if(flag){
+			console.log('isOtherSnake!');
+		}
+		return flag;
 	},
 	// 是否是水果的坐标
 	'#isFruit':function(posi){
